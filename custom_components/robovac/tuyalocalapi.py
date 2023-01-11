@@ -365,7 +365,7 @@ class TuyaCipher:
             version = (0, 0)
         if version != self.version:
             return 0
-        if version < (3, 3):
+        if version < (3, 1):
             hash = encrypted_data[3:19].decode("ascii")
             expected_hash = self.hash(encrypted_data[19:])
             if hash != expected_hash:
@@ -381,7 +381,7 @@ class TuyaCipher:
         prefix_size = self.get_prefix_size_and_validate(command, data)
         data = data[prefix_size:]
         decryptor = self.cipher.decryptor()
-        if self.version < (3, 3):
+        if self.version < (3, 1):
             data = base64.b64decode(data)
         decrypted_data = decryptor.update(data)
         decrypted_data += decryptor.finalize()
@@ -402,7 +402,7 @@ class TuyaCipher:
             encrypted_data += encryptor.finalize()
 
         prefix = ".".join(map(str, self.version)).encode("utf8")
-        if self.version < (3, 3):
+        if self.version < (3, 1):
             payload = base64.b64encode(encrypted_data)
             hash = self.hash(payload)
             prefix += hash.encode("utf8")
@@ -488,7 +488,7 @@ class Message:
             self.command,
             payload_size,
         )
-        if self.device and self.device.version >= (3, 3):
+        if self.device and self.device.version >= (3, 1):
             checksum = crc(header + payload_data)
         else:
             checksum = crc(payload_data)
@@ -630,7 +630,7 @@ class TuyaDevice:
         local_key=None,
         port=6668,
         gateway_id=None,
-        version=(3, 3),
+        version=(3, 1),
     ):
         """Initialize the device."""
         self.device_id = device_id
@@ -694,7 +694,7 @@ class TuyaDevice:
 
     async def async_get(self, callback=None):
         payload = {"gwId": self.gateway_id, "devId": self.device_id}
-        maybe_self = None if self.version < (3, 3) else self
+        maybe_self = None if self.version < (3, 1) else self
         message = Message(Message.GET_COMMAND, payload, encrypt_for=maybe_self)
         return await message.async_send(self, callback)
 
@@ -710,7 +710,7 @@ class TuyaDevice:
     async def _async_ping(self, ping_interval):
         # print("ping")
         self.last_ping = time.time()
-        maybe_self = None if self.version < (3, 3) else self
+        maybe_self = None if self.version < (3, 1) else self
         message = Message(Message.PING_COMMAND, sequence=0, encrypt_for=maybe_self)
         await self._async_send(message)
         await asyncio.sleep(ping_interval)
