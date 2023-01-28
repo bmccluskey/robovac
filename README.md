@@ -17,7 +17,7 @@ Couple of Pre-reqs
 If you want you can clone this repo manually, oterwise use HACS (Recommended).
 
 ### Using HACS
-1. In HACS add this repo as an integration additional repository.
+1. In [HACS](https://hacs.xyz/) add this repo as an integration additional repository.
 2. Then install it. 
 3. Restart Home Assistant
 4. Go to the Integrations Page and Click +Add Integration button
