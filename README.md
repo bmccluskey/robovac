@@ -2,19 +2,19 @@
 <a href="https://www.buymeacoffee.com/bmccluskey" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 # Eufy RobovVac control for Home Assistant
 
-A brand new version Eufy RoboVac integration for Home Assistant that includes a Config Flow to add your RoboVac(s) and the local key and ID required.  All you need to do is enter your Eufy app credentials and the Config Flow will look up the details for you. After the initial config use the configuration button on the Integration to enter the RoboVac IP address when prompted.
+A brand-new version Eufy RoboVac integration for Home Assistant that includes a Config Flow to add your RoboVac(s) and the local key and ID required.  All you need to do is enter your Eufy app credentials and the Config Flow will look up the details for you. After the initial config use the configuration button on the Integration to enter the RoboVac IP address when prompted.
 
 This work has evovled from the original work by Richard Mitchell https://github.com/mitchellrj and the countless others who have contributed over the last couple of years. It also builds on the work done by Andre Borie https://gitlab.com/Rjevski/eufy-device-id-and-local-key-grabber to get the required local ID and key.
 
-This project has been forked many times since the  I am building upon the original work done by Richard and attempting to simplfy the operation and number of files involved.  
+This project has been forked many times since then.  I am building upon the original work done by Richard and attempting to simplify the operation and number of files involved.  
 
 ## Installation ##
 Couple of Pre-reqs 
-1. Make sure your Home Assistant Core is up to date
+1. Make sure your Home Assistant Core is up-to-date
 2. Remove any previous Eufy or RoboVac installation including entries in the configuration.yaml
 
 
-If you want you can clone this repo manually, oterwise use HACS (Recommended).
+If you want you can clone this repo manually, otherwise use HACS (Recommended).
 
 ### Using HACS
 1. In HACS add this repo as an integration additional repository.
@@ -22,15 +22,36 @@ If you want you can clone this repo manually, oterwise use HACS (Recommended).
 3. Restart Home Assistant
 4. Go to the Integrations Page and Click +Add Integration button
 5. Search for Eufy Robovac and select it
-6. Enter your Eufy username and password (The ones you use to login to the add with) and submit
-7. If youve done it correctly you should get a success dialoge and option to enter an Area for each RoboVac you have
+6. Enter your Eufy username and password (The ones you use to log in to the add with) and submit
+7. If you've done it correctly you should get a success dialog and option to enter an Area for each RoboVac you have
 8. Click Finish
 9. On the Integrations Screen Locate your Eufy Robovac card and click the configure button
-10. Select the Radio button beside the Vacuum name and type its IP addess in the box and press Submit
+10. Select the Radio button beside the Vacuum name and type its IP address in the box and press Submit
 (You need to repeat steps 9 and 10 for each RoboVac you have)
 11. Enjoy
 
 Please note: You may have to get a new version of the access key for your vacuum from time to time if Eufy change it. Worst case you have to Delete the integration and re add it to get the new key.
+
+
+### Sending Commands with vacuum.send_command (Room Clean)
+It is possible to send commands to the RoboVac that are not explicitly included in available actions for some models
+
+For RoboVac X8 and possibly other models. You can send a roomClean command, along with the specified roomId and count.
+
+```
+service: vacuum.send_command
+data:
+  command: roomClean
+  params:
+    roomIds:
+      - 4
+    count: 1
+target:
+  entity_id: vacuum.YOURVACNAME
+```
+You will have to play around a little to determine specific roomIds. Start with id 0, then take note of the room that is cleaned.
+follow this process for each roomId. Now you can automate specific room cleaning.
+
 
 ### Optional 1: Scripts
 
@@ -247,6 +268,43 @@ shortcuts:
     icon: mdi:volume-off
 ```
 
+## Error Code Reference
+
+Here's a list of the strings that are returned within the Status Attribute when an error occurs:
+```
+"Error: Front bumper stuck"
+"Error: Wheel stuck"
+"Error: Side brush"
+"Error: Rolling brush bar stuck"
+"Error: Device trapped"
+"Error: Device trapped"
+"Error: Wheel suspended"
+"Error: Low battery"
+"Error: Magnetic boundary"
+"Error: Right wall sensor"
+"Error: Device tilted"
+"Error: Insert dust collector"
+"Error: Restricted area detected"
+"Error: Laser cover stuck"
+"Error: Laser sesor stuck"
+"Error: Laser sensor blocked"
+"Error: Base blocked"
+"Error: Battery"
+"Error: Wheel Module"
+"Error: Side Brush"
+"Error: Suction Fan"
+"Error: Rolling Brush"
+"Error: Path Tracking Sensor"
+"Error: Wheel stuck"
+"Error: Rolling brush stuck"
+"Error: Front bumper stuck"
+"Error: Sensor dirty"
+"Error: Low battery"
+"Error: Device trapped"
+"Error: Fan stuck"
+"Error: Side brush stuck"
+```
+
 ## Debugging ##
 I have left quite a few debug statements in the code and they may be useful to see whats happening by looking in the System Log files. The Log Viewer Addon available in the Home Assistance store can be very useful to watch the logs being updated in real time.  To get the debugging to add to the logs you need to add the below text to your configuration.yaml 
 ```
@@ -255,7 +313,5 @@ logger:
   logs:
     custom_components.robovac.vacuum: debug
     custom_components.robovac.tuyalocalapi: debug
-```
+
 ---
-
-
