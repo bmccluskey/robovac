@@ -269,7 +269,19 @@ class RoboVacEntity(VacuumEntity):
                 | RoboVacEntityFeature.AUTO_RETURN
                 | RoboVacEntityFeature.CONSUMABLES
             )
-        elif self.model_code[0:5] in ["T2262"]:  # X
+        elif self.model_code[0:5] in ["T2190"]:  # L
+            self._attr_fan_speed_list = ["Mop", "Quiet" "Standard", "Turbo", "Max"]
+            self._attr_robovac_supported = (
+                RoboVacEntityFeature.CLEANING_TIME
+                | RoboVacEntityFeature.CLEANING_AREA
+                | RoboVacEntityFeature.DO_NOT_DISTURB
+                | RoboVacEntityFeature.AUTO_RETURN
+                | RoboVacEntityFeature.CONSUMABLES
+                | RoboVacEntityFeature.ZONE
+                | RoboVacEntityFeature.MAP
+                | RoboVacEntityFeature.BOOST_IQ
+            )
+        elif self.model_code[0:5] in ["T2262", "T2262EV", "T2261", "T2261A"]:  # X
             self._attr_fan_speed_list = ["Pure", "Standard", "Turbo", "Max"]
             self._attr_robovac_supported = (
                 RoboVacEntityFeature.CLEANING_TIME
