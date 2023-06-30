@@ -70,6 +70,22 @@ def get_eufy_vacuums(self):
     if user_response["res_code"] != 1:
         raise InvalidAuth
 
+    self[CONF_CLIENT_ID] = user_response["user_info"]["id"]
+    self[CONF_PHONE_CODE] = user_response["user_info"]["phone_code"]
+
+    tuya_client = TuyaAPISession(
+        username="eh-" + self[CONF_CLIENT_ID], country_code=self[CONF_PHONE_CODE]
+    )
+    allvacs = {}
+    for home in tuya_client.list_homes():
+        for device in tuya_client.list_devices(home["groupId"]):
+            vac_details = {
+                CONF_ACCESS_TOKEN: device["localKey"],
+                CONF_LOCATION: home["groupId"],
+            }
+
+            allvacs[device["devId"]] = vac_details
+
     response = eufy_session.get_device_info(
         user_response["user_info"]["request_host"],
         user_response["user_info"]["id"],
@@ -77,14 +93,10 @@ def get_eufy_vacuums(self):
     )
 
     device_response = response.json()
-    self[CONF_CLIENT_ID] = user_response["user_info"]["id"]
-    self[CONF_PHONE_CODE] = user_response["user_info"]["phone_code"]
 
-    # self[CONF_VACS] = {}
     items = device_response["items"]
-    allvacs = {}
     for item in items:
-        if item["device"]["product"]["appliance"] == "Cleaning":
+        if item["device"]["product"]["appliance"] == "Cleaning" and item["device"]["id"] in allvacs:
             vac_details = {
                 CONF_ID: item["device"]["id"],
                 CONF_MODEL: item["device"]["product"]["product_code"],
@@ -93,16 +105,9 @@ def get_eufy_vacuums(self):
                 CONF_MAC: item["device"]["wifi"]["mac"],
                 CONF_IP_ADDRESS: "",
             }
-            allvacs[item["device"]["id"]] = vac_details
-    self[CONF_VACS] = allvacs
+            allvacs[item["device"]["id"]].update(vac_details)
 
-    tuya_client = TuyaAPISession(
-        username="eh-" + self[CONF_CLIENT_ID], country_code=self[CONF_PHONE_CODE]
-    )
-    for home in tuya_client.list_homes():
-        for device in tuya_client.list_devices(home["groupId"]):
-            self[CONF_VACS][device["devId"]][CONF_ACCESS_TOKEN] = device["localKey"]
-            self[CONF_VACS][device["devId"]][CONF_LOCATION] = home["groupId"]
+    self[CONF_VACS] = allvacs
 
     return response
 
@@ -138,7 +143,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         else:
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
-            # return await self.async_step_repo(valid_data)
+
             return self.async_create_entry(title=unique_id, data=valid_data)
         return self.async_show_form(
             step_id="user", data_schema=USER_SCHEMA, errors=errors
@@ -183,7 +188,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     item_settings[CONF_IP_ADDRESS] = user_input[CONF_IP_ADDRESS]
             updated_repos = deepcopy(self.config_entry.data[CONF_VACS])
 
-            # print("Updated", updated_repos)
             if not errors:
                 # Value of data will be set on the options property of our config_entry
                 # instance.
