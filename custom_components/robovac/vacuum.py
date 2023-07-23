@@ -260,7 +260,7 @@ class RoboVacEntity(VacuumEntity):
             self._attr_robovac_supported = (
                 RoboVacEntityFeature.EDGE | RoboVacEntityFeature.SMALL_ROOM
             )
-        elif self.model_code[0:5] in ["T1250", "T2250", "T2251", "T2252", "T2253"]:  # G
+        elif self.model_code[0:5] in ["T1250", "T2250", "T2251", "T2252", "T2253", "T2259"]:  # G
             self._attr_fan_speed_list = ["Standard", "Turbo", "Max", "Boost IQ"]
             self._attr_robovac_supported = (
                 RoboVacEntityFeature.CLEANING_TIME
