@@ -115,7 +115,7 @@ async def async_setup_entry(
         async_add_entities([RoboVacEntity(item)])
 
 
-class RoboVacEntity(VacuumEntity):
+class RoboVacEntity(StateVacuumEntity):
     """Eufy Robovac version of a Vacuum entity"""
 
     _attr_should_poll = True
@@ -197,7 +197,7 @@ class RoboVacEntity(VacuumEntity):
             data[ATTR_BATTERY_ICON] = self.battery_icon
         if self.supported_features & VacuumEntityFeature.FAN_SPEED:
             data[ATTR_FAN_SPEED] = self.fan_speed
-        if self.supported_features & VacuumEntityFeature.STATUS:
+        if self.supported_features & VacuumEntityFeature.STATE:
             data[ATTR_STATUS] = self.status
         if self.robovac_supported & RoboVacEntityFeature.CLEANING_AREA:
             data[ATTR_CLEANING_AREA] = self.cleaning_area
