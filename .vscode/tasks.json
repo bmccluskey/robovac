@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install requirements",
+      "type": "shell",
+      "command": "pip3 install -r requirements.txt;pip3 install -r requirements-dev.txt",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Home Assistant on port 8123",
+      "type": "shell",
+      "command": "python -m homeassistant",
+      "problemMatcher": []
+    },
+    {
+      "label": "Unit tests",
+      "type": "shell",
+      "command": "pytest --cov=. --cov-config=.coveragerc --cov-report xml:coverage.xml",
+      "problemMatcher": []
+    },
+    {
+      "label": "Reformat code",
+      "type": "shell",
+      "command": "isort --recursive . &&  black .",
+      "problemMatcher": []
+    }
+  ]
+}
