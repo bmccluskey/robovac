@@ -16,37 +16,33 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
 from copy import deepcopy
+from typing import Any, Optional
 
-import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
-
+import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.core import callback
-from homeassistant.core import HomeAssistant
+from homeassistant.const import (
+    CONF_ACCESS_TOKEN,
+    CONF_CLIENT_ID,
+    CONF_DESCRIPTION,
+    CONF_ID,
+    CONF_IP_ADDRESS,
+    CONF_LOCATION,
+    CONF_MAC,
+    CONF_MODEL,
+    CONF_NAME,
+    CONF_PASSWORD,
+    CONF_USERNAME,
+)
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.selector import selector
 
-from homeassistant.const import (
-    CONF_ACCESS_TOKEN,
-    CONF_NAME,
-    CONF_ID,
-    CONF_MODEL,
-    CONF_USERNAME,
-    CONF_PASSWORD,
-    CONF_IP_ADDRESS,
-    CONF_DESCRIPTION,
-    CONF_MAC,
-    CONF_LOCATION,
-    CONF_CLIENT_ID,
-)
-
-from .const import DOMAIN, CONF_VACS, CONF_PHONE_CODE
-
-from .tuyawebapi import TuyaAPISession
+from .const import CONF_PHONE_CODE, CONF_VACS, DOMAIN
 from .eufywebapi import EufyLogon
+from .tuyawebapi import TuyaAPISession
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -96,7 +92,10 @@ def get_eufy_vacuums(self):
 
     items = device_response["items"]
     for item in items:
-        if item["device"]["product"]["appliance"] == "Cleaning" and item["device"]["id"] in allvacs:
+        if (
+            item["device"]["product"]["appliance"] == "Cleaning"
+            and item["device"]["id"] in allvacs
+        ):
             vac_details = {
                 CONF_ID: item["device"]["id"],
                 CONF_MODEL: item["device"]["product"]["product_code"],

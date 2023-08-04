@@ -8,22 +8,45 @@
       "problemMatcher": []
     },
     {
+      "label": "Clone home assistant",
+      "type": "shell",
+      "command": "git clone https://github.com/home-assistant/core.git ~/core",
+    },
+    {
+      "label": "Install home assistant",
+      "type": "shell",
+      "command": "pip install --user -r ~/core/requirements_all.txt",
+      "dependsOn": "Clone home assistannt"
+    },
+    {
+      "label": "Translate home assistant",
+      "type": "shell",
+      "command": "cd ~/core && python3 -m script.translations develop --all",
+      "dependsOn": "Install home assistannt"
+    },
+    {
       "label": "Run Home Assistant on port 8123",
       "type": "shell",
-      "command": "python -m homeassistant",
-      "problemMatcher": []
+      "command": "python -m homeassistant -v",
+      "problemMatcher": [],
+      "dependsOn": [
+        "Translate home assistant",
+        "Install requirements"
+      ]
     },
     {
       "label": "Unit tests",
       "type": "shell",
       "command": "pytest --cov=. --cov-config=.coveragerc --cov-report xml:coverage.xml",
-      "problemMatcher": []
+      "problemMatcher": [],
+      "dependsOn": "Install requirements"
     },
     {
       "label": "Reformat code",
       "type": "shell",
       "command": "isort --recursive . &&  black .",
-      "problemMatcher": []
+      "problemMatcher": [],
+      "dependsOn": "Install requirements"
     }
   ]
 }

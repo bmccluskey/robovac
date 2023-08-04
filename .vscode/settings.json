@@ -4,10 +4,9 @@
   "editor.formatOnType": true,
   "files.eol": "\n",
   "files.trimTrailingWhitespace": true,
-  "python.linting.pylintEnabled": true,
-  "python.linting.enabled": true,
-  "python.formatting.provider": "none",
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter"
-  }
+  },
+  "pylint.importStrategy": "fromEnvironment",
+  "black-formatter.importStrategy": "fromEnvironment"
 }
