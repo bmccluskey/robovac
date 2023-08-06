@@ -1,0 +1,12 @@
+{
+  "editor.formatOnPaste": false,
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "pylint.importStrategy": "fromEnvironment",
+  "black-formatter.importStrategy": "fromEnvironment"
+}

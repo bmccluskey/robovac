@@ -1,6 +1,5 @@
 """Original Work from here: Andre Borie https://gitlab.com/Rjevski/eufy-device-id-and-local-key-grabber"""
 
-from hashlib import md5, sha256
 import hmac
 import json
 import math
@@ -8,10 +7,11 @@ import random
 import string
 import time
 import uuid
+from hashlib import md5, sha256
 
+import requests
 from cryptography.hazmat.backends.openssl import backend as openssl_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-import requests
 
 TUYA_INITIAL_BASE_URL = "https://a1.tuyaeu.com"
 
@@ -86,7 +86,6 @@ DEFAULT_TUYA_QUERY_PARAMS = {
 
 
 class TuyaAPISession:
-
     username = None
     country_code = None
     session_id = None

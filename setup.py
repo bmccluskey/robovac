@@ -17,25 +17,26 @@
 
 
 import re
-from setuptools import setup, find_packages
 import sys
 import warnings
+
+from setuptools import find_packages, setup
 
 dynamic_requires = []
 
 setup(
-    name='robovac',
+    name="robovac",
     version="1.0",
-    author='Brendan McCluskey',
-    url='http://github.com/bmccluskey/robovac',
+    author="Brendan McCluskey",
+    url="http://github.com/bmccluskey/robovac",
     packages=find_packages(),
     scripts=[],
-    description='Python API for controlling Eufy Robovac vacuum cleaners',
+    description="Python API for controlling Eufy Robovac vacuum cleaners",
     classifiers=[
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache Software License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
     ],
 )

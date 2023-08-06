@@ -49,9 +49,8 @@ import time
 
 from cryptography.hazmat.backends.openssl import backend as openssl_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives.hashes import Hash, MD5
+from cryptography.hazmat.primitives.hashes import MD5, Hash
 from cryptography.hazmat.primitives.padding import PKCS7
-
 
 _LOGGER = logging.getLogger(__name__)
 MESSAGE_PREFIX_FORMAT = ">IIII"
@@ -435,7 +434,6 @@ def crc(data):
 
 
 class Message:
-
     PING_COMMAND = 0x09
     GET_COMMAND = 0x0A
     SET_COMMAND = 0x07
