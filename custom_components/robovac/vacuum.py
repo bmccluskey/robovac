@@ -335,7 +335,7 @@ class RoboVacEntity(StateVacuumEntity):
                 | VacuumEntityFeature.STATE
                 | VacuumEntityFeature.STOP
             )
-        elif self.model_code[0:5] in ["T2262"]:  # X
+        elif self.model_code[0:5] in ["T2262", "T2262A", "T2261", "T2261A"]:  # X
             self._attr_fan_speed_list = ["Pure", "Standard", "Turbo", "Max"]
             self._attr_robovac_supported = (
                 RoboVacEntityFeature.CLEANING_TIME
