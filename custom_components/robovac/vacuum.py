@@ -313,7 +313,7 @@ class RoboVacEntity(StateVacuumEntity):
                 | VacuumEntityFeature.STATE
                 | VacuumEntityFeature.STOP
             )
-        elif self.model_code[0:5] in ["T1250", "T2250", "T2251", "T2252", "T2253"]:  # G
+        elif self.model_code[0:5] in ["T1250", "T2250", "T2251", "T2252", "T2253", "T2150", "T2255"]:  # G
             self._attr_fan_speed_list = [
                 "Standard", "Turbo", "Max", "Boost IQ"]
             self._attr_robovac_supported = (
