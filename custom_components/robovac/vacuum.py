@@ -14,51 +14,45 @@
 
 """Eufy Robovac sensor platform."""
 from __future__ import annotations
-from collections.abc import Mapping
 
-from datetime import timedelta
-import logging
+import ast
 import asyncio
 import base64
 import json
+import logging
 import time
-import ast
-
-from typing import Any
 from enum import IntEnum, StrEnum
-from homeassistant.loader import bind_hass
+from typing import Any
+
 from homeassistant.components.vacuum import (
-    StateVacuumEntity,
-    VacuumEntityFeature,
     STATE_CLEANING,
     STATE_DOCKED,
     STATE_ERROR,
     STATE_IDLE,
-    STATE_RETURNING,)
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import (
-    CONNECTION_NETWORK_MAC,
+    STATE_RETURNING,
+    StateVacuumEntity,
+    VacuumEntityFeature,
 )
-from homeassistant.helpers.entity import DeviceInfo
-
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
+    ATTR_BATTERY_LEVEL,
     CONF_ACCESS_TOKEN,
-    CONF_MODEL,
-    CONF_NAME,
+    CONF_DESCRIPTION,
     CONF_ID,
     CONF_IP_ADDRESS,
-    CONF_DESCRIPTION,
     CONF_MAC,
+    CONF_MODEL,
+    CONF_NAME,
     STATE_ON,
 )
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import CONNECTION_NETWORK_MAC
+from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.loader import bind_hass
 
 from .const import CONF_VACS, DOMAIN
-
 from .tuyalocalapi import TuyaDevice
-
-from homeassistant.const import ATTR_BATTERY_LEVEL
 
 
 class RoboVacEntityFeature(IntEnum):
@@ -99,38 +93,39 @@ SCAN_INTERVAL = timedelta(seconds=REFRESH_RATE)
 
 ERROR_MESSAGES = {
     "IP_ADDRESS": "IP Address not set",
-    1:"Error: Front bumper stuck",
-    2:"Error: Wheel stuck",
-    3:"Error: Side brush",
-    4:"Error: Rolling brush bar stuck",
-    5:"Error: Device trapped",
-    6:"Error: Device trapped",
-    7:"Error: Wheel suspended",
-    8:"Error: Low battery",
-    9:"Error: Magnetic boundary",
-    12:"Error: Right wall sensor",
-    13:"Error: Device tilted",
-    14:"Error: Insert dust collector",
-    17:"Error: Restricted area detected",
-    18:"Error: Laser cover stuck",
-    19:"Error: Laser sesor stuck",
-    20:"Error: Laser sensor blocked",
-    21:"Error: Base blocked",
-    "S1":"Error: Battery",
-    "S2":"Error: Wheel Module",
-    "S3":"Error: Side Brush",
-    "S4":"Error: Suction Fan",
-    "S5":"Error: Rolling Brush",
-    "S8":"Error: Path Tracking Sensor",
-    "Wheel_stuck":"Error: Wheel stuck",
-    "R_brush_stuck":"Error: Rolling brush stuck",
-    "Crash_bar_stuck":"Error: Front bumper stuck",
-    "sensor_dirty":"Error: Sensor dirty",
-    "N_enough_pow":"Error: Low battery",
-    "Stuck_5_min":"Error: Device trapped",
-    "Fan_stuck":"Error: Fan stuck",
-    "S_brush_stuck":"Error: Side brush stuck",
+    1: "Error: Front bumper stuck",
+    2: "Error: Wheel stuck",
+    3: "Error: Side brush",
+    4: "Error: Rolling brush bar stuck",
+    5: "Error: Device trapped",
+    6: "Error: Device trapped",
+    7: "Error: Wheel suspended",
+    8: "Error: Low battery",
+    9: "Error: Magnetic boundary",
+    12: "Error: Right wall sensor",
+    13: "Error: Device tilted",
+    14: "Error: Insert dust collector",
+    17: "Error: Restricted area detected",
+    18: "Error: Laser cover stuck",
+    19: "Error: Laser sesor stuck",
+    20: "Error: Laser sensor blocked",
+    21: "Error: Base blocked",
+    "S1": "Error: Battery",
+    "S2": "Error: Wheel Module",
+    "S3": "Error: Side Brush",
+    "S4": "Error: Suction Fan",
+    "S5": "Error: Rolling Brush",
+    "S8": "Error: Path Tracking Sensor",
+    "Wheel_stuck": "Error: Wheel stuck",
+    "R_brush_stuck": "Error: Rolling brush stuck",
+    "Crash_bar_stuck": "Error: Front bumper stuck",
+    "sensor_dirty": "Error: Sensor dirty",
+    "N_enough_pow": "Error: Low battery",
+    "Stuck_5_min": "Error: Device trapped",
+    "Fan_stuck": "Error: Fan stuck",
+    "S_brush_stuck": "Error: Side brush stuck",
 }
+
 
 class TUYA_CODES(StrEnum):
     BATTERY_LEVEL = "104"
@@ -150,8 +145,9 @@ class TUYA_CODES(StrEnum):
 class robovac(TuyaDevice):
     """"""
 
+
 async def async_setup_entry(
-    hass: HomeAssistant,
+    hass: HomeAssistant,  # pylint: disable=unused-argument
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
@@ -236,7 +232,9 @@ class RoboVacEntity(StateVacuumEntity):
 
     @property
     def state(self) -> str | None:
-        if self.tuya_state is None or (type(self.error_code) is not None and self.error_code not in [0, "no_error"]):
+        if self.tuya_state is None or (
+            type(self.error_code) is not None and self.error_code not in [0, "no_error"]
+        ):
             return STATE_ERROR
         elif self.tuya_state == "Charging" or self.tuya_state == "completed":
             return STATE_DOCKED
@@ -259,7 +257,7 @@ class RoboVacEntity(StateVacuumEntity):
         if self.supported_features & VacuumEntityFeature.FAN_SPEED:
             data[ATTR_FAN_SPEED] = self.fan_speed
         if self.supported_features & VacuumEntityFeature.STATUS:
-            data[ATTR_STATUS] = self.status
+            data[ATTR_STATUS] = self.state
         if self.robovac_supported & RoboVacEntityFeature.CLEANING_AREA:
             data[ATTR_CLEANING_AREA] = self.cleaning_area
         if self.robovac_supported & RoboVacEntityFeature.CLEANING_TIME:
@@ -296,8 +294,7 @@ class RoboVacEntity(StateVacuumEntity):
             "T2128",
             "T2130",
         ]:  # C
-            self._attr_fan_speed_list = [
-                "No Suction", "Standard", "Boost IQ", "Max"]
+            self._attr_fan_speed_list = ["No Suction", "Standard", "Boost IQ", "Max"]
             self._attr_robovac_supported = (
                 RoboVacEntityFeature.EDGE | RoboVacEntityFeature.SMALL_ROOM
             )
@@ -313,9 +310,16 @@ class RoboVacEntity(StateVacuumEntity):
                 | VacuumEntityFeature.STATE
                 | VacuumEntityFeature.STOP
             )
-        elif self.model_code[0:5] in ["T1250", "T2250", "T2251", "T2252", "T2253", "T2150", "T2255"]:  # G
-            self._attr_fan_speed_list = [
-                "Standard", "Turbo", "Max", "Boost IQ"]
+        elif self.model_code[0:5] in [
+            "T1250",
+            "T2250",
+            "T2251",
+            "T2252",
+            "T2253",
+            "T2150",
+            "T2255",
+        ]:  # G
+            self._attr_fan_speed_list = ["Standard", "Turbo", "Max", "Boost IQ"]
             self._attr_robovac_supported = (
                 RoboVacEntityFeature.CLEANING_TIME
                 | RoboVacEntityFeature.CLEANING_AREA
@@ -374,26 +378,29 @@ class RoboVacEntity(StateVacuumEntity):
                 (CONNECTION_NETWORK_MAC, item[CONF_MAC]),
             ],
         )
-        self.vacuum = robovac(
+        self.vacuum = RoboVac(
             device_id=self.unique_id,
             host=self.ip_address,
             local_key=self.access_token,
             timeout=2,
-            ping_interval=10
+            ping_interval=10,
             # ping_interval=REFRESH_RATE / 2,
         )
         self.error_code = None
         self.tuya_state = None
         self.tuyastatus = None
+        self.tuyastatus: dict | None = None
+        _LOGGER.debug("vac: %s", self.vacuum)
 
     async def async_update(self):
         """Synchronise state from the vacuum."""
+        _LOGGER.debug("update: %s", self.name)
         self.async_write_ha_state()
         if self.ip_address == "":
             return
         await self.vacuum.async_get()
-        self.tuyastatus = self.vacuum._dps
-        print("Tuya local API Result:", self.tuyastatus)
+        self.tuyastatus = self.vacuum.state
+        _LOGGER.debug("Tuya local API Result: %s", self.tuyastatus)
         # for 15C
         self._attr_battery_level = self.tuyastatus.get(TUYA_CODES.BATTERY_LEVEL)
         self.tuya_state = self.tuyastatus.get(TUYA_CODES.STATE)
@@ -415,7 +422,7 @@ class RoboVacEntity(StateVacuumEntity):
             self._attr_consumables = ast.literal_eval(
                 base64.b64decode(self.tuyastatus.get("142")).decode("ascii")
             )["consumable"]["duration"]
-            print(self.consumables)
+            _LOGGER.debug(self.consumables)
         # For X8
         self._attr_boost_iq = self.tuyastatus.get(TUYA_CODES.BOOST_IQ)
         # self.map_data = self.tuyastatus.get("121")
@@ -424,11 +431,10 @@ class RoboVacEntity(StateVacuumEntity):
             self._attr_consumables = ast.literal_eval(
                 base64.b64decode(self.tuyastatus.get("116")).decode("ascii")
             )["consumable"]["duration"]
-            print(self.consumables)
+            _LOGGER.debug(self.consumables)
 
     async def async_locate(self, **kwargs):
         """Locate the vacuum cleaner."""
-        print("Locate Pressed")
         _LOGGER.info("Locate Pressed")
         if self.tuyastatus.get("103"):
             await self.vacuum.async_set({"103": False}, None)
@@ -437,11 +443,10 @@ class RoboVacEntity(StateVacuumEntity):
 
     async def async_return_to_base(self, **kwargs):
         """Set the vacuum cleaner to return to the dock."""
-        print("Return home Pressed")
         _LOGGER.info("Return home Pressed")
         await self.vacuum.async_set({"101": True}, None)
         await asyncio.sleep(1)
-        self.async_update
+        await self.async_update()
 
     async def async_start(self, **kwargs):
         if self.mode == "Nosweep":
@@ -464,16 +469,14 @@ class RoboVacEntity(StateVacuumEntity):
 
     async def async_clean_spot(self, **kwargs):
         """Perform a spot clean-up."""
-        print("Spot Clean Pressed")
         _LOGGER.info("Spot Clean Pressed")
         await self.vacuum.async_set({"5": "Spot"}, None)
         await asyncio.sleep(1)
-        self.async_update
+        await self.async_update()
 
     async def async_set_fan_speed(self, fan_speed, **kwargs):
         """Set fan speed."""
-        print("Fan Speed Selected", fan_speed)
-        _LOGGER.info("Fan Speed Selected")
+        _LOGGER.info("Fan Speed Selected: %s", fan_speed)
         if fan_speed == "No Suction":
             fan_speed = "No_suction"
         elif fan_speed == "Boost IQ":
@@ -482,7 +485,7 @@ class RoboVacEntity(StateVacuumEntity):
             fan_speed = "Quiet"
         await self.vacuum.async_set({"102": fan_speed}, None)
         await asyncio.sleep(1)
-        self.async_update
+        await self.async_update()
 
     async def async_send_command(
         self, command: str, params: dict | list | None = None, **kwargs
@@ -513,18 +516,17 @@ class RoboVacEntity(StateVacuumEntity):
             else:
                 await self.vacuum.async_set({"118": True}, None)
         elif command == "roomClean":
-            roomIds = params.get("roomIds", [1])
+            room_ids = params.get("roomIds", [1])
             count = params.get("count", 1)
-            clean_request = {"roomIds": roomIds, "cleanTimes": count}
+            clean_request = {"roomIds": room_ids, "cleanTimes": count}
             method_call = {
                 "method": "selectRoomsClean",
                 "data": clean_request,
                 "timestamp": round(time.time() * 1000),
             }
             json_str = json.dumps(method_call, separators=(",", ":"))
-            base64_str = base64.b64encode(
-                json_str.encode("utf8")).decode("utf8")
+            base64_str = base64.b64encode(json_str.encode("utf8")).decode("utf8")
             _LOGGER.info("roomClean call %s", json_str)
             await self.vacuum.async_set({"124": base64_str}, None)
         await asyncio.sleep(1)
-        self.async_update
+        await self.async_update()
