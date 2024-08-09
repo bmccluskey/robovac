@@ -290,7 +290,7 @@ class RoboVacEntity(StateVacuumEntity):
             host=self.ip_address,
             local_key=self.access_token,
             timeout=2,
-            ping_interval=10
+            ping_interval=10,
             # ping_interval=REFRESH_RATE / 2,
         )
         self.error_code = None

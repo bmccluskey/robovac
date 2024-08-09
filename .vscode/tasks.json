@@ -40,7 +40,7 @@
     {
       "label": "Reformat code",
       "type": "shell",
-      "command": "isort --recursive . &&  black .",
+      "command": "isort . &&  black .",
       "problemMatcher": [],
       "dependsOn": "Install requirements"
     }
