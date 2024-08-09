@@ -1,0 +1,48 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install requirements",
+      "type": "shell",
+      "command": "pip3 install -r requirements.txt;pip3 install -r requirements-dev.txt",
+      "problemMatcher": []
+    },
+    {
+      "label": "Clone home assistant",
+      "type": "shell",
+      "command": "git clone https://github.com/home-assistant/core.git ~/core",
+    },
+    {
+      "label": "Install home assistant",
+      "type": "shell",
+      "command": "pip install --user -r ~/core/requirements_all.txt",
+      "dependsOn": "Clone home assistant"
+    },
+    {
+      "label": "Translate home assistant",
+      "type": "shell",
+      "command": "cd ~/core && python3 -m script.translations develop --all",
+      "dependsOn": "Install home assistant"
+    },
+    {
+      "label": "Run Home Assistant on port 8123",
+      "type": "shell",
+      "command": "python -m homeassistant -v",
+      "problemMatcher": []
+    },
+    {
+      "label": "Unit tests",
+      "type": "shell",
+      "command": "pytest --cov=. --cov-config=.coveragerc --cov-report xml:coverage.xml",
+      "problemMatcher": [],
+      "dependsOn": "Install requirements"
+    },
+    {
+      "label": "Reformat code",
+      "type": "shell",
+      "command": "isort . &&  black .",
+      "problemMatcher": [],
+      "dependsOn": "Install requirements"
+    }
+  ]
+}
